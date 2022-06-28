@@ -1,8 +1,10 @@
-const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const express = require("express");
 
 const app = express();
 
+app.use(helmet());
 app.use(
   cors({
     origin: "http://localhost:3000",
