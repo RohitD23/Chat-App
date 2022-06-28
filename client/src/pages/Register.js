@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
-import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Logo from "../assets/logo.svg";
-import { registerURL } from "../utils/APIRoutes";
+import { httpAddNewUser } from "../utils/requests";
 
 function Register() {
+  const navigate = useNavigate();
+
   const toastOptions = {
     position: "bottom-right",
     autoClose: 8000,
@@ -28,14 +29,13 @@ function Register() {
     event.preventDefault();
     if (handleValidation()) {
       const { email, username, password } = values;
-      const { response } = await axios.post(registerURL, {
-        email,
-        username,
-        password,
-      });
 
-      if (response.status === false) {
-        toast.error(response.msg, toastOptions);
+      const response = await httpAddNewUser({ email, username, password });
+      console.log(response);
+      if (response.ok === true) {
+        navigate("/");
+      } else {
+        toast.error(response.error, toastOptions);
       }
     }
   };
