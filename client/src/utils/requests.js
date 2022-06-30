@@ -24,4 +24,9 @@ async function httpLogin(user) {
   return await response.json();
 }
 
-export { httpAddNewUser, httpLogin };
+async function httpCheckUserLoggedIn() {
+  const response = await fetch(`${API_URL}auth`);
+  return await response.json();
+}
+
+export { httpAddNewUser, httpLogin, httpCheckUserLoggedIn };

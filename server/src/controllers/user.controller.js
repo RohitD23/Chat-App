@@ -22,13 +22,13 @@ async function addNewUser(req, res, next) {
       password: hashedPassword,
     });
 
-    return res.status(201).json({ ok: true, user });
+    return res.status(201).json({ ok: true, user }).redirect("/login");
   } catch (error) {
     next(error);
   }
 }
 
-async function verifyUser(req, res, next) {
+async function loginUser(req, res, next) {
   try {
     const { username, password } = req.body;
 
@@ -42,10 +42,25 @@ async function verifyUser(req, res, next) {
       return res.status(400).json({ error: "Incorrect Username or Password" });
     }
 
+    res.cookie("user", user._id, {
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: true,
+      httpOnly: true,
+      sameSite: "lax",
+    });
+
     return res.status(200).json({ ok: true, user });
   } catch (error) {
     next(error);
   }
 }
 
-module.exports = { addNewUser, verifyUser };
+async function checkUserLoggedIn(req, res) {
+  if (req.cookies.user === null) {
+    return await res.json({ ok: false });
+  } else {
+    return await res.json({ ok: true });
+  }
+}
+
+module.exports = { addNewUser, loginUser, checkUserLoggedIn };

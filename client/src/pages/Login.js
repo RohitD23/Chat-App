@@ -28,7 +28,6 @@ function Login() {
     if (handleValidation()) {
       const response = await httpLogin(values);
 
-      console.log(response);
       if (response.ok === true) {
         navigate("/");
       } else {
