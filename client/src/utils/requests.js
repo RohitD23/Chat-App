@@ -12,4 +12,16 @@ async function httpAddNewUser(user) {
   return await response.json();
 }
 
-export { httpAddNewUser };
+async function httpLogin(user) {
+  const response = await fetch(`${API_URL}auth/login`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
+
+  return await response.json();
+}
+
+export { httpAddNewUser, httpLogin };

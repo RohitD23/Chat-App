@@ -22,12 +22,30 @@ async function addNewUser(req, res, next) {
       password: hashedPassword,
     });
 
-    delete user.password;
-
     return res.status(201).json({ ok: true, user });
   } catch (error) {
     next(error);
   }
 }
 
-module.exports = { addNewUser };
+async function verifyUser(req, res, next) {
+  try {
+    const { username, password } = req.body;
+
+    const user = await Users.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Incorrect Username or Password" });
+    }
+
+    return res.status(200).json({ ok: true, user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { addNewUser, verifyUser };

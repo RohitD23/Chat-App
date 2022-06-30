@@ -31,9 +31,9 @@ function Register() {
       const { email, username, password } = values;
 
       const response = await httpAddNewUser({ email, username, password });
-      console.log(response);
+
       if (response.ok === true) {
-        navigate("/");
+        navigate("/login");
       } else {
         toast.error(response.error, toastOptions);
       }
