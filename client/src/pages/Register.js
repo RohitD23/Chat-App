@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Logo from "../assets/logo.svg";
 import { httpAddNewUser } from "../utils/requests";
 
-function Register() {
+export default function Register() {
   const navigate = useNavigate();
 
   const toastOptions = {
@@ -32,10 +32,10 @@ function Register() {
 
       const response = await httpAddNewUser({ email, username, password });
 
-      if (response.ok === true) {
-        navigate("/login");
-      } else {
+      if (response.ok === false) {
         toast.error(response.error, toastOptions);
+      } else {
+        navigate("/setAvatar");
       }
     }
   };
@@ -206,5 +206,3 @@ const FormContainer = styled.div`
     }
   }
 `;
-
-export default Register;

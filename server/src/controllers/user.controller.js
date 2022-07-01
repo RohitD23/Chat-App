@@ -1,66 +1,51 @@
-const bcrypt = require("bcrypt");
+const axios = require("axios");
+const { Buffer } = require("buffer");
 
 const Users = require("../models/user.model");
 
-const saltRounds = 10;
-async function addNewUser(req, res, next) {
+const AVATAR_API = `https://api.multiavatar.com`;
+
+async function getAvatars(req, res) {
   try {
-    const { username, email, password } = req.body;
+    const data = [];
+    for (let i = 0; i < 4; i++) {
+      const image = await axios.get(
+        `${AVATAR_API}/${Math.round(Math.random() * 1000)}`
+      );
+      const buffer = new Buffer.from(image.data);
+      data.push(buffer.toString("base64"));
+    }
 
-    const usernameCheck = await Users.findOne({ username });
-    if (usernameCheck)
-      return res.status(400).json({ error: "Username already exists" });
+    if (!data) return res.status(500).json({ ok: false });
 
-    const emailCheck = await Users.findOne({ email });
-    if (emailCheck)
-      return res.status(400).json({ error: "Email already exists" });
-
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const user = await Users.create({
-      username,
-      email,
-      password: hashedPassword,
-    });
-
-    return res.status(201).json({ ok: true, user }).redirect("/login");
-  } catch (error) {
-    next(error);
+    return res.status(200).json({ data });
+  } catch (err) {
+    return res.status(500).json({ ok: false });
   }
 }
 
-async function loginUser(req, res, next) {
+async function setAvatar(req, res, next) {
   try {
-    const { username, password } = req.body;
+    const userId = req.params.userId;
+    const { avatarImage } = req.body;
 
-    const user = await Users.findOne({ username });
+    const user = await Users.findByIdAndUpdate(
+      userId,
+      {
+        avatarImage,
+        isAvatarSet: true,
+      },
+      { new: true }
+    );
+
     if (!user) {
-      return res.status(400).json({ error: "Invalid username or password" });
+      return res.status(400).json({ ok: false });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ error: "Incorrect Username or Password" });
-    }
-
-    res.cookie("user", user._id, {
-      maxAge: 24 * 60 * 60 * 1000,
-      secure: true,
-      httpOnly: true,
-      sameSite: "lax",
-    });
-
-    return res.status(200).json({ ok: true, user });
-  } catch (error) {
-    next(error);
+    return res.status(200).json({ user });
+  } catch (err) {
+    next(err);
   }
 }
 
-async function checkUserLoggedIn(req, res) {
-  if (req.cookies.user === null) {
-    return await res.json({ ok: false });
-  } else {
-    return await res.json({ ok: true });
-  }
-}
-
-module.exports = { addNewUser, loginUser, checkUserLoggedIn };
+module.exports = { getAvatars, setAvatar };

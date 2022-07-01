@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Logo from "../assets/logo.svg";
-import { httpLogin } from "../utils/requests";
+import { httpLogin, httpCheckUserLoggedIn } from "../utils/requests";
 
-function Login() {
+export default function Login() {
   const navigate = useNavigate();
 
   const toastOptions = {
@@ -28,10 +28,10 @@ function Login() {
     if (handleValidation()) {
       const response = await httpLogin(values);
 
-      if (response.ok === true) {
-        navigate("/");
-      } else {
+      if (response.ok === false) {
         toast.error(response.error, toastOptions);
+      } else {
+        navigate("/");
       }
     }
   };
@@ -53,6 +53,17 @@ function Login() {
 
     return true;
   };
+
+  useEffect(() => {
+    async function checkUserLoggedIn() {
+      const response = await httpCheckUserLoggedIn();
+      if (response === true) {
+        navigate("/");
+      }
+    }
+    checkUserLoggedIn();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -108,7 +119,6 @@ const FormContainer = styled.div`
       text-transform: uppercase;
     }
   }
-
   form {
     display: flex;
     flex-direction: column;
@@ -117,7 +127,6 @@ const FormContainer = styled.div`
     border-radius: 2rem;
     padding: 3rem 5rem;
   }
-
   input {
     background-color: transparent;
     padding: 1rem;
@@ -131,7 +140,6 @@ const FormContainer = styled.div`
       outline: none;
     }
   }
-
   button {
     background-color: #4e0eff;
     color: white;
@@ -143,7 +151,6 @@ const FormContainer = styled.div`
     font-size: 1rem;
     text-transform: uppercase;
   }
-
   span {
     color: white;
     text-transform: uppercase;
@@ -154,5 +161,3 @@ const FormContainer = styled.div`
     }
   }
 `;
-
-export default Login;

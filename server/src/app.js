@@ -1,10 +1,11 @@
 const cors = require("cors");
-const path = require("path");
 const helmet = require("helmet");
+const path = require("path");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 
-const authRouter = require("./routes/user.router");
+const userRouter = require("./routes/user.router");
+const authRouter = require("./routes/auth.router");
 
 const app = express();
 
@@ -15,7 +16,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-app.use("/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
 app.use("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "index.html"));
 });
