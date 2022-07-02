@@ -5,6 +5,45 @@ const Users = require("../models/user.model");
 
 const AVATAR_API = `https://api.multiavatar.com`;
 
+async function getUser(req, res, next) {
+  try {
+    const userId = req.cookies.user;
+
+    const user = await Users.findOne(userId, [
+      "username",
+      "avatarImage",
+      "_id",
+    ]);
+    if (!user) {
+      return res.status(400).json({ ok: false });
+    }
+
+    return res.status(200).json({ user });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getAllUsers(req, res, next) {
+  try {
+    const userId = req.params.userId;
+
+    const users = await Users.find({ _id: { $ne: userId } }, [
+      "username",
+      "avatarImage",
+      "_id",
+    ]);
+
+    if (!users) {
+      return res.status(400).json({ ok: false });
+    }
+
+    return res.status(200).json({ users });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function getAvatars(req, res) {
   try {
     const data = [];
@@ -48,4 +87,4 @@ async function setAvatar(req, res, next) {
   }
 }
 
-module.exports = { getAvatars, setAvatar };
+module.exports = { getUser, getAllUsers, getAvatars, setAvatar };

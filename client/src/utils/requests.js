@@ -51,6 +51,16 @@ async function httpLogin(user) {
   return await response.json();
 }
 
+async function httpGetUser() {
+  const response = await fetch(`${API_URL}/user`);
+  return await response.json();
+}
+
+async function httpLoadAllContacts(_id) {
+  const response = await fetch(`${API_URL}/user/${_id}`);
+  return await response.json();
+}
+
 export {
   httpAddNewUser,
   httpLoadAvatars,
@@ -58,4 +68,6 @@ export {
   httpGetUserId,
   httpCheckUserLoggedIn,
   httpLogin,
+  httpGetUser,
+  httpLoadAllContacts,
 };
