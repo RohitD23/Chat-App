@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import loader from "../assets/loader.gif";
 import Welcome from "../components/Welcome";
 import Contacts from "../components/Contacts";
+import ChatContainer from "../components/ChatContainer";
 import { httpGetUser, httpLoadAllContacts } from "../utils/requests";
 
 export default function Chat() {
@@ -78,7 +79,7 @@ export default function Chat() {
             {currentChat === undefined ? (
               <Welcome username={currentUser.username} />
             ) : (
-              <div>Chat</div>
+              <ChatContainer currentChat={currentChat} />
             )}
           </div>
         </Container>

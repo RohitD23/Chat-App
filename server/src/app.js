@@ -10,6 +10,13 @@ const authRouter = require("./routes/auth.router");
 const app = express();
 
 app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "img-src": ["'self' data:", "https://cdn.jsdelivr.net"],
+    },
+  })
+);
 app.use(cookieParser());
 
 app.use(cors());

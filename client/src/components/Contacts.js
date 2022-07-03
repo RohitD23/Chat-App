@@ -172,7 +172,7 @@ const Container = styled.div`
     display: none;
     position: absolute;
     background-color: #f1f1f1;
-    min-width: 7rem;
+    min-width: 8rem;
     bottom: 1.8rem;
     right: 0.1rem;
     z-index: 1;
@@ -180,7 +180,7 @@ const Container = styled.div`
 
   .dropup-content a {
     color: black;
-    padding: 1rem;
+    padding: 0.5rem;
     text-decoration: none;
     display: block;
   }
