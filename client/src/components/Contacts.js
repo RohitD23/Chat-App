@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -6,12 +6,19 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import Logo from "../assets/logo.svg";
 import { httpLogOut } from "../utils/requests";
 
-export default function Contacts({ contacts, currentUser }) {
+export default function Contacts({ contacts, currentUser, changeChat }) {
   const navigate = useNavigate();
+
+  const [currentSelected, setCurrentSelected] = useState(undefined);
 
   const logOut = async () => {
     await httpLogOut();
     navigate("/login");
+  };
+
+  const changeCurrentChat = (index, contact) => {
+    setCurrentSelected(index);
+    changeChat(contact);
   };
 
   return (
@@ -22,9 +29,15 @@ export default function Contacts({ contacts, currentUser }) {
           <h3>snappy</h3>
         </div>
         <div className="contacts">
-          {contacts.map((contact) => {
+          {contacts.map((contact, index) => {
             return (
-              <div key={contact._id} className="contact">
+              <div
+                key={contact._id}
+                className={`contact ${
+                  index === currentSelected ? "selected" : ""
+                }`}
+                onClick={() => changeCurrentChat(index, contact)}
+              >
                 <div className="avatar">
                   <img
                     src={`data:image/svg+xml;base64,${contact.avatarImage}`}
@@ -53,7 +66,7 @@ export default function Contacts({ contacts, currentUser }) {
               <BsThreeDotsVertical />
             </button>
             <div className="dropup-content">
-              <a href="/setAvatar">Set Avatar</a>
+              <a href="/setAvatar">Change Avatar</a>
               <a href="/#" onClick={logOut}>
                 Log Out
               </a>

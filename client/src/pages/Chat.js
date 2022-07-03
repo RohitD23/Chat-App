@@ -25,6 +25,10 @@ export default function Chat() {
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
 
+  const handleChatChange = (chat) => {
+    setCurrentChat(chat);
+  };
+
   useEffect(() => {
     async function getUser() {
       const response = await httpGetUser();
@@ -66,7 +70,11 @@ export default function Chat() {
       ) : (
         <Container>
           <div className="container">
-            <Contacts contacts={contacts} currentUser={currentUser} />
+            <Contacts
+              contacts={contacts}
+              currentUser={currentUser}
+              changeChat={handleChatChange}
+            />
             {currentChat === undefined ? (
               <Welcome username={currentUser.username} />
             ) : (
@@ -75,6 +83,7 @@ export default function Chat() {
           </div>
         </Container>
       )}
+      <ToastContainer />
     </>
   );
 }
