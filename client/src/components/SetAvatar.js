@@ -14,7 +14,7 @@ import {
 export default function SetAvatar() {
   const navigate = useNavigate();
   const [avatars, setAvatars] = useState([]);
-  const [userId, setUserId] = useState(undefined);
+  const [username, setUsername] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingFailed, setLoadingFailed] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState(undefined);
@@ -32,7 +32,7 @@ export default function SetAvatar() {
       toast.error("Please select an avatar", toastOptions);
     } else {
       const avatarImage = avatars[selectedAvatar];
-      const response = await httpSaveAvatar({ avatarImage, userId });
+      const response = await httpSaveAvatar({ avatarImage, username });
 
       if (response.ok === false) {
         toast.error("Error setting avatar. Please try again.", toastOptions);
@@ -64,7 +64,7 @@ export default function SetAvatar() {
       if (response.ok === false) {
         navigate("/login");
       } else {
-        setUserId(response.userId);
+        setUsername(response.username);
       }
     }
     getUser();
@@ -164,5 +164,8 @@ const Container = styled.div`
     border-radius: 0.4rem;
     font-size: 1rem;
     text-transform: uppercase;
+    &:hover {
+      background-color: #7345f5;
+    }
   }
 `;

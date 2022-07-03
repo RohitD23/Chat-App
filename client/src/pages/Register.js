@@ -194,6 +194,9 @@ const FormContainer = styled.div`
     border-radius: 0.4rem;
     font-size: 1rem;
     text-transform: uppercase;
+    &:hover {
+      background-color: #7345f5;
+    }
   }
 
   span {

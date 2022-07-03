@@ -7,13 +7,18 @@ const AVATAR_API = `https://api.multiavatar.com`;
 
 async function getUser(req, res, next) {
   try {
-    const userId = req.cookies.user;
+    const username = req.cookies.user;
 
-    const user = await Users.findOne(userId, [
+    if (!username) {
+      return res.status(400).json({ ok: false });
+    }
+
+    const user = await Users.findOne({ username }, [
+      "_id",
       "username",
       "avatarImage",
-      "_id",
     ]);
+
     if (!user) {
       return res.status(400).json({ ok: false });
     }
@@ -26,12 +31,12 @@ async function getUser(req, res, next) {
 
 async function getAllUsers(req, res, next) {
   try {
-    const userId = req.params.userId;
+    const username = req.params.username;
 
-    const users = await Users.find({ _id: { $ne: userId } }, [
+    const users = await Users.find({ username: { $ne: username } }, [
+      "_id",
       "username",
       "avatarImage",
-      "_id",
     ]);
 
     if (!users) {
@@ -47,6 +52,7 @@ async function getAllUsers(req, res, next) {
 async function getAvatars(req, res) {
   try {
     const data = [];
+
     for (let i = 0; i < 4; i++) {
       const image = await axios.get(
         `${AVATAR_API}/${Math.round(Math.random() * 1000)}`
@@ -65,11 +71,11 @@ async function getAvatars(req, res) {
 
 async function setAvatar(req, res, next) {
   try {
-    const userId = req.params.userId;
+    const username = req.params.username;
     const { avatarImage } = req.body;
 
-    const user = await Users.findByIdAndUpdate(
-      userId,
+    const user = await Users.findOneAndUpdate(
+      { username },
       {
         avatarImage,
         isAvatarSet: true,

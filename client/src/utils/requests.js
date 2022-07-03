@@ -18,8 +18,8 @@ async function httpLoadAvatars() {
 }
 
 async function httpSaveAvatar(avatarData) {
-  const { userId, avatarImage } = avatarData;
-  const response = await fetch(`${API_URL}/user/avatars/${userId}`, {
+  const { username, avatarImage } = avatarData;
+  const response = await fetch(`${API_URL}/user/avatars/${username}`, {
     method: "post",
     headers: {
       "Content-Type": "application/json",
@@ -40,7 +40,7 @@ async function httpCheckUserLoggedIn() {
   return ok;
 }
 
-async function httpLogin(user) {
+async function httpLogIn(user) {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "post",
     headers: {
@@ -51,13 +51,17 @@ async function httpLogin(user) {
   return await response.json();
 }
 
+async function httpLogOut() {
+  await fetch(`${API_URL}/auth/logout`);
+}
+
 async function httpGetUser() {
   const response = await fetch(`${API_URL}/user`);
   return await response.json();
 }
 
-async function httpLoadAllContacts(_id) {
-  const response = await fetch(`${API_URL}/user/${_id}`);
+async function httpLoadAllContacts(username) {
+  const response = await fetch(`${API_URL}/user/users/${username}`);
   return await response.json();
 }
 
@@ -67,7 +71,8 @@ export {
   httpSaveAvatar,
   httpGetUserId,
   httpCheckUserLoggedIn,
-  httpLogin,
+  httpLogIn,
+  httpLogOut,
   httpGetUser,
   httpLoadAllContacts,
 };

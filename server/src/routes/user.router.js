@@ -10,9 +10,9 @@ const {
 const userRouter = express.Router();
 
 userRouter.get("/", getUser);
-userRouter.get("/:userId", getAllUsers);
+userRouter.get("/users/:username", getAllUsers);
 userRouter.get("/avatars", getAvatars);
 
-userRouter.post("/avatars/:userId", setAvatar);
+userRouter.post("/avatars/:username", setAvatar);
 
 module.exports = userRouter;

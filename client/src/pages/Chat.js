@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import loader from "../assets/loader.gif";
 import Welcome from "../components/Welcome";
+import Contacts from "../components/Contacts";
 import { httpGetUser, httpLoadAllContacts } from "../utils/requests";
 
 export default function Chat() {
@@ -40,7 +41,8 @@ export default function Chat() {
 
   useEffect(() => {
     async function loadAllContacts() {
-      const response = await httpLoadAllContacts(currentUser._id);
+      const response = await httpLoadAllContacts(currentUser.username);
+
       if (response.ok === false) {
         toast.error("Failed to load contacts", toastOptions);
       } else {
@@ -57,18 +59,22 @@ export default function Chat() {
 
   return (
     <>
-      <Container>
-        <div className="container">
-          {isLoading ? (
-            <img src={loader} alt="loader" className="loader" />
-          ) : currentChat === undefined ? (
-            <Welcome username={currentUser.username} />
-          ) : (
-            <div>Chat</div>
-          )}
-        </div>
-        <ToastContainer />
-      </Container>
+      {isLoading ? (
+        <Container>
+          <img src={loader} alt="loader" className="loader" />
+        </Container>
+      ) : (
+        <Container>
+          <div className="container">
+            <Contacts contacts={contacts} currentUser={currentUser} />
+            {currentChat === undefined ? (
+              <Welcome username={currentUser.username} />
+            ) : (
+              <div>Chat</div>
+            )}
+          </div>
+        </Container>
+      )}
     </>
   );
 }

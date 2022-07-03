@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Logo from "../assets/logo.svg";
-import { httpLogin, httpCheckUserLoggedIn } from "../utils/requests";
+import { httpLogIn, httpCheckUserLoggedIn } from "../utils/requests";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (handleValidation()) {
-      const response = await httpLogin(values);
+      const response = await httpLogIn(values);
 
       if (response.ok === false) {
         toast.error(response.error, toastOptions);
@@ -150,6 +150,9 @@ const FormContainer = styled.div`
     border-radius: 0.4rem;
     font-size: 1rem;
     text-transform: uppercase;
+    &:hover {
+      background-color: #7345f5;
+    }
   }
   span {
     color: white;
