@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import io from "socket.io-client";
 import styled from "styled-components";
+import React, { useState, useEffect, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import ChatInput from "./ChatInput";
 import { httpSaveMessage, httpGetMessages } from "../utils/requests";
+
+const socket = io.connect("http://localhost:8000");
 
 export default function ChatContainer({ currentChat, currentUser }) {
   const toastOptions = {
@@ -15,6 +19,7 @@ export default function ChatContainer({ currentChat, currentUser }) {
   };
 
   const [messages, setMessages] = useState([]);
+  const [room, setRoom] = useState(undefined);
   const scrollRef = useRef();
 
   const handleSendMsg = async (msg) => {
@@ -25,6 +30,16 @@ export default function ChatContainer({ currentChat, currentUser }) {
     if (response.ok === false) {
       toast.error("Failed to send message!", toastOptions);
     }
+
+    const msgs = [...messages];
+    msgs.push({ fromSelf: true, message: msg });
+    setMessages(msgs);
+
+    socket.emit("send-msg", {
+      fromSelf: false,
+      message: msg,
+      room: room,
+    });
   };
 
   useEffect(() => {
@@ -37,13 +52,38 @@ export default function ChatContainer({ currentChat, currentUser }) {
         toast.error("Failed to load previous chat", toastOptions);
       } else {
         setMessages(response.messages);
-        console.log(messages);
       }
     }
 
+    function joinRoom() {
+      const user1 = currentUser.username;
+      const user2 = currentChat.username;
+      const roomName = user1 < user2 ? user1 + user2 : user2 + user1;
+      socket.emit("join_room", roomName);
+      setRoom(roomName);
+    }
+
     getMessages();
+    joinRoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentChat]);
+
+  useEffect(() => {
+    socket.on("rec-msg", (data) => {
+      const { fromSelf, message } = data;
+
+      if (room === data.room) {
+        const msgs = [...messages];
+        msgs.push({ fromSelf, message });
+        setMessages(msgs);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <Container>
@@ -118,40 +158,32 @@ const Container = styled.div`
     flex-direction: column;
     gap: 1rem;
     overflow: auto;
-    &::-webkit-scrollbar {
-      width: 0.2rem;
-      &-thumb {
-        background-color: #ffffff39;
-        width: 0.1rem;
-        border-radius: 1rem;
+  }
+  .message {
+    display: flex;
+    align-items: center;
+    .content {
+      max-width: 40%;
+      overflow-wrap: break-word;
+      padding: 1rem;
+      font-size: 1.1rem;
+      border-radius: 1rem;
+      color: #d1d1d1;
+      @media screen and (min-width: 720px) and (max-width: 1080px) {
+        max-width: 70%;
       }
     }
-    .message {
-      display: flex;
-      align-items: center;
-      .content {
-        max-width: 40%;
-        overflow-wrap: break-word;
-        padding: 1rem;
-        font-size: 1.1rem;
-        border-radius: 1rem;
-        color: #d1d1d1;
-        @media screen and (min-width: 720px) and (max-width: 1080px) {
-          max-width: 70%;
-        }
-      }
+  }
+  .sended {
+    justify-content: flex-end;
+    .content {
+      background-color: #4f04ff21;
     }
-    .sended {
-      justify-content: flex-end;
-      .content {
-        background-color: #4f04ff21;
-      }
-    }
-    .recieved {
-      justify-content: flex-start;
-      .content {
-        background-color: #9900ff20;
-      }
+  }
+  .recieved {
+    justify-content: flex-start;
+    .content {
+      background-color: #9900ff20;
     }
   }
 `;
