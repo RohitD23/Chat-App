@@ -40,7 +40,7 @@ async function getAllUsers(req, res, next) {
     ]);
 
     if (!users) {
-      return res.status(400).json({ ok: false });
+      return res.status(500).json({ ok: false });
     }
 
     return res.status(200).json({ users });
@@ -84,7 +84,7 @@ async function setAvatar(req, res, next) {
     );
 
     if (!user) {
-      return res.status(400).json({ ok: false });
+      return res.status(500).json({ ok: false });
     }
 
     return res.status(200).json({ user });

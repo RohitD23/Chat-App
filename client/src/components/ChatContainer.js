@@ -1,11 +1,27 @@
 import React from "react";
 import styled from "styled-components";
+import { toast, ToastContainer } from "react-toastify";
 
 import ChatInput from "./ChatInput";
+import { httpSaveMessage } from "../utils/requests";
 
-export default function ChatContainer({ currentChat }) {
-  const handleSendMsg = (msg) => {
-    alert(msg);
+export default function ChatContainer({ currentChat, currentUser }) {
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 8000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
+
+  const handleSendMsg = async (msg) => {
+    const from = currentUser._id;
+    const to = currentChat._id;
+    const response = await httpSaveMessage({ from, to, msg });
+
+    if (response.ok === false) {
+      toast.error("Failed to send message!", toastOptions);
+    }
   };
 
   return (
@@ -25,6 +41,7 @@ export default function ChatContainer({ currentChat }) {
       </div>
       <div className="chat-messages"></div>
       <ChatInput handleSendMsg={handleSendMsg} />
+      <ToastContainer />
     </Container>
   );
 }

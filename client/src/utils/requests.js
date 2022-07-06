@@ -65,6 +65,17 @@ async function httpLoadAllContacts(username) {
   return await response.json();
 }
 
+async function httpSaveMessage({ from, to, msg }) {
+  const response = await fetch(`${API_URL}/messages/save`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from, to, msg }),
+  });
+  return await response.json();
+}
+
 export {
   httpAddNewUser,
   httpLoadAvatars,
@@ -75,4 +86,5 @@ export {
   httpLogOut,
   httpGetUser,
   httpLoadAllContacts,
+  httpSaveMessage,
 };

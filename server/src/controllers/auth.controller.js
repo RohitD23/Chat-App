@@ -2,9 +2,6 @@ const bcrypt = require("bcrypt");
 
 const Users = require("../models/user.model");
 
-const COOKIE_DOMAIN = "localhost";
-const COOKIE_PATH = "/";
-
 async function getUserId(req, res, next) {
   try {
     const username = req.cookies.user;
@@ -39,6 +36,10 @@ async function addNewUser(req, res, next) {
       email,
       password: hashedPassword,
     });
+
+    if (!user) {
+      return res.status(500).json({ ok: false, error: "Failed to Register" });
+    }
 
     res.cookie("user", user.username, {
       maxAge: 24 * 60 * 60 * 1000,
