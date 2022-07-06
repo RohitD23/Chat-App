@@ -76,6 +76,18 @@ async function httpSaveMessage({ from, to, msg }) {
   return await response.json();
 }
 
+async function httpGetMessages({ from, to }) {
+  const response = await fetch(`${API_URL}/messages/get`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from, to }),
+  });
+
+  return await response.json();
+}
+
 export {
   httpAddNewUser,
   httpLoadAvatars,
@@ -87,4 +99,5 @@ export {
   httpGetUser,
   httpLoadAllContacts,
   httpSaveMessage,
+  httpGetMessages,
 };

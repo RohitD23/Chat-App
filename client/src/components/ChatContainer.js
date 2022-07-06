@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { toast, ToastContainer } from "react-toastify";
 
 import ChatInput from "./ChatInput";
-import { httpSaveMessage } from "../utils/requests";
+import { httpSaveMessage, httpGetMessages } from "../utils/requests";
 
 export default function ChatContainer({ currentChat, currentUser }) {
   const toastOptions = {
@@ -14,6 +14,9 @@ export default function ChatContainer({ currentChat, currentUser }) {
     theme: "dark",
   };
 
+  const [messages, setMessages] = useState([]);
+  const scrollRef = useRef();
+
   const handleSendMsg = async (msg) => {
     const from = currentUser._id;
     const to = currentChat._id;
@@ -23,6 +26,24 @@ export default function ChatContainer({ currentChat, currentUser }) {
       toast.error("Failed to send message!", toastOptions);
     }
   };
+
+  useEffect(() => {
+    async function getMessages() {
+      const from = currentUser._id;
+      const to = currentChat._id;
+      const response = await httpGetMessages({ from, to });
+
+      if (response.ok === false) {
+        toast.error("Failed to load previous chat", toastOptions);
+      } else {
+        setMessages(response.messages);
+        console.log(messages);
+      }
+    }
+
+    getMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentChat]);
 
   return (
     <Container>
@@ -39,7 +60,23 @@ export default function ChatContainer({ currentChat, currentUser }) {
           </div>
         </div>
       </div>
-      <div className="chat-messages"></div>
+      <div className="chat-messages">
+        {messages.map((message) => {
+          return (
+            <div ref={scrollRef}>
+              <div
+                className={`message ${
+                  message.fromSelf ? "sended" : "recieved"
+                }`}
+              >
+                <div className="content ">
+                  <p>{message.message}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
       <ChatInput handleSendMsg={handleSendMsg} />
       <ToastContainer />
     </Container>
