@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ChatInput from "./ChatInput";
 import { httpSaveMessage, httpGetMessages } from "../utils/requests";
 
-const socket = io.connect("http://localhost:8000");
+const socket = io("http://localhost:8000");
 
 export default function ChatContainer({ currentChat, currentUser }) {
   const toastOptions = {
@@ -19,7 +19,8 @@ export default function ChatContainer({ currentChat, currentUser }) {
   };
 
   const [messages, setMessages] = useState([]);
-  const [room, setRoom] = useState(undefined);
+  const [arrivalMsg, setArrivalMsg] = useState(null);
+  const room = useRef("");
   const scrollRef = useRef();
 
   const handleSendMsg = async (msg) => {
@@ -36,9 +37,8 @@ export default function ChatContainer({ currentChat, currentUser }) {
     setMessages(msgs);
 
     socket.emit("send-msg", {
-      fromSelf: false,
       message: msg,
-      room: room,
+      room: room.current,
     });
   };
 
@@ -60,7 +60,7 @@ export default function ChatContainer({ currentChat, currentUser }) {
       const user2 = currentChat.username;
       const roomName = user1 < user2 ? user1 + user2 : user2 + user1;
       socket.emit("join_room", roomName);
-      setRoom(roomName);
+      room.current = roomName;
     }
 
     getMessages();
@@ -70,16 +70,19 @@ export default function ChatContainer({ currentChat, currentUser }) {
 
   useEffect(() => {
     socket.on("rec-msg", (data) => {
-      const { fromSelf, message } = data;
+      const { message } = data;
 
-      if (room === data.room) {
-        const msgs = [...messages];
-        msgs.push({ fromSelf, message });
-        setMessages(msgs);
+      if (room.current === data.room) {
+        setArrivalMsg({ fromSelf: false, message });
       }
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  });
+  }, [socket]);
+
+  useEffect(() => {
+    arrivalMsg && setMessages((prev) => [...prev, arrivalMsg]);
+  }, [arrivalMsg]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
